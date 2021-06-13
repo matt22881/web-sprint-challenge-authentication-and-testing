@@ -32,20 +32,20 @@ router.post('/register', validate, checkUsername, (req, res, next) => {
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-      let user = req.body;
-      const rounds = process.env.BCRYPT_ROUNDS || 8
-      const hash = bcrypt.hashSync(user.password, rounds)
-    
-      user.password = hash
-    
-      Users.add(user)
-        .then(saved => {
-          res.status(201).json({message: `Great to have you, ${saved.username}`,
+  let user = req.body;
+  const rounds = process.env.BCRYPT_ROUNDS || 8
+  const hash = bcrypt.hashSync(user.password, rounds)
+
+  user.password = hash
+
+  Users.add(user)
+    .then(saved => {
+      res.status(201).json(saved)
+    })
+    .catch(err => next(err))
+})
             
-          });
-        })
-        .catch(err => next(err))
-    });
+    
 
 
 router.post('/login', validate, (req, res, next) => {
@@ -83,7 +83,7 @@ router.post('/login', validate, (req, res, next) => {
           token
         })
       } else {
-        res.status(401).json({ message: 'invalid Credentials' })
+        res.status(401).json({ message: 'invalid credentials' })
       }
     })
     .catch(err => next(err))
